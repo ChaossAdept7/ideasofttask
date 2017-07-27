@@ -1,0 +1,19 @@
+*{
+  font-family: 'Roboto', sans-serif;
+}
+
+.App,.flex-container{
+  height: 100%;
+}
+
+.flex-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+a{
+  text-decoration: none;
+  color:rgba(0, 0, 0, 0.87);
+}
