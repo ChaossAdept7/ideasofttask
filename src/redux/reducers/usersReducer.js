@@ -15,6 +15,7 @@ let usersReducer = function(users={success:false, status:"new"}, action) {
                 selected_user:{},
                 created:false,
                 updated:false,
+                action:""
             };
             break;
         case 'GETTING_USERS_LIST_FAILURE':
@@ -32,6 +33,7 @@ let usersReducer = function(users={success:false, status:"new"}, action) {
             let data = action.data;
 
             let objToReturn = {
+                ...users,
                 new_user:action.data,
                 success:false,
                 status:"done",
@@ -40,7 +42,7 @@ let usersReducer = function(users={success:false, status:"new"}, action) {
             /* success case */
             if(data && data.id){
                 objToReturn = {
-                ...users,
+                    ...users,
                     new_user:action.data,
                     success:true,
                     status:"done",

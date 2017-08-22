@@ -23,6 +23,10 @@ class CreateUser extends Component {
         isUpdate:false
     };
 
+    message = 'User was created';
+    title = "User was created successfully";
+    runAfterPopUpCloses = null;
+
     /* code duplication, but in simple applications i don't think that it is a problem */
     /* dialog actions */
     handleOpen = () => {
@@ -31,17 +35,29 @@ class CreateUser extends Component {
 
     handleClose = () => {
         this.setState({open: false});
-        /* redirrect to users list */
-        this.props.history.push('/');
+        /* check presence */
+        if(this.runAfterPopUpCloses)
+            /* run if present */
+            this.runAfterPopUpCloses();
     };
 
     createUser = () => {
         /* reformat users array to create valid object */
         let user = this.state.userData;
+        let {last_name, first_name} = user;
+
+        if (!last_name || !first_name ){
+            this.message = 'Enter information';
+            this.title = "Enter at least last name or first name";
+            this.runAfterPopUpCloses = null;
+            this.handleOpen();
+            return false;
+        }
         user.metadata = {
-            first_name:user.first_name,
-            last_name:user.last_name
+            first_name,
+            last_name
         };
+
         /* server will return error about unknown keys */
         delete user.first_name;
         delete user.last_name;
@@ -52,9 +68,15 @@ class CreateUser extends Component {
                 if(!user[key])
                     delete user[key];
             });
-            console.log(user);
+            /* set dialog headers */
+            this.message = 'User was updated';
+            this.title = "User was updated successfully";
             this.props.updateUser(user);
+                    /* redirrect to users list */
         }else{
+            /* set dialog headers */
+            this.message = 'User was created';
+            this.title = "User was created successfully";
             this.props.createUser(user);
         }
     };
@@ -63,23 +85,27 @@ class CreateUser extends Component {
         let {status, created} = newProps.users;
         /* if user was created - show dilog with info */
         if(created &&  status == "done"){
+            /* set after close function and open dialog */
+            this.runAfterPopUpCloses = ()=>this.props.history.push('/');
             this.handleOpen();
         }
 
         /* check if update */
         let {id} = this.props;
+
         if(id && id.length > 0){
             let {selected_user:userData, status, success} = newProps.users;
-            /* to pass to our inputs data we need to renake it */
+            /* to pass to our inputs data we need to remake it */
             if(userData && status == "done" && success){
+
                 let {first_name="", last_name=""} = userData.metadata;
+
                 userData = {
                     ...userData,
                     first_name,
                     last_name
                 };
             }
-
             this.setState({
                 userData
             });
@@ -118,13 +144,13 @@ class CreateUser extends Component {
                     isUpdate = {(this.props.id && this.props.id.length>0)? 'Update User':'Create User'}
                 />
                 <Dialog
-                    title={`User was ${(!this.state.isUpdate)? "created": "updated"}`}
+                    title={this.title}
                     actions={actions}
                     modal={false}
                     open={this.state.open}
                     onRequestClose={this.handleClose}
                 >
-                    User was {(!this.state.isUpdate)? "created": "updated"} successfully.
+                    {this.message}
                 </Dialog>
             </Paper>
         </div>

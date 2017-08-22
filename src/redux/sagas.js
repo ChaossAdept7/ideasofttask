@@ -18,7 +18,6 @@ const myHeaders = new Headers({
 const url = "https://api.stripe.com/v1/customers";
 
 function createUser(user){
-
     let result =
         fetch(url,{
             method: 'POST',
